@@ -1,0 +1,39 @@
+# Copyrights 2023 Playtika Ltd., all rights reserved to Playtika Ltd.
+# privacy+e17bb14d-edc1-4d26-930d-486fcc1ab8fe@playtika.com
+
+version: '3'
+services:
+  selenoid:
+    image: "aerokube/selenoid"
+    network_mode: bridge
+    restart: "no"
+    ports:
+      - "4444:4444"
+    volumes:
+      - "$PWD:/etc/selenoid/"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  selenoid-ui:
+    image: "aerokube/selenoid-ui"
+    network_mode: bridge
+    depends_on:
+      - selenoid
+    links:
+      - selenoid
+    restart: "no"
+    ports:
+      - "8080:8080"
+    command: [ "--selenoid-uri", "http://selenoid:4444" ]
+
+  chrome:
+    image: selenoid/chrome:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenoid
+
+  firefox:
+    image: selenoid/firefox:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenoid
